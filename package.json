@@ -10,7 +10,7 @@
     "pretest": "npm run lint && npm run beautify-lint",
     "test": "mocha --reporter spec",
     "precover": "npm run lint && npm run beautify-lint",
-    "cover": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec",
+    "cover": "istanbul cover node_modules/mocha/bin/_mocha",
     "travis": "npm run cover -- --report lcovonly"
   },
   "repository": {
