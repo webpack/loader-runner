@@ -1,0 +1,40 @@
+{
+  "name": "loader-runner",
+  "version": "2.0.0",
+  "description": "Runs (webpack) loaders",
+  "main": "lib/LoaderRunner.js",
+  "scripts": {
+    "beautify-lint": "beautify-lint lib/**.js test/*.js",
+    "beautify": "beautify-rewrite lib/**.js test/*.js",
+    "lint": "eslint lib test",
+    "pretest": "npm run lint && npm run beautify-lint",
+    "test": "mocha --reporter spec",
+    "precover": "npm run lint && npm run beautify-lint",
+    "cover": "istanbul cover node_modules/mocha/bin/_mocha -- -R spec",
+    "travis": "npm run cover -- --report lcovonly"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/webpack/loader-runner.git"
+  },
+  "keywords": [
+    "webpack",
+    "loader"
+  ],
+  "author": "Tobias Koppers @sokra",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/webpack/loader-runner/issues"
+  },
+  "homepage": "https://github.com/webpack/loader-runner#readme",
+  "devDependencies": {
+    "beautify-lint": "^1.0.4",
+    "codecov.io": "^0.1.6",
+    "coveralls": "^2.11.6",
+    "eslint": "^1.10.3",
+    "eslint-plugin-nodeca": "^1.0.3",
+    "istanbul": "^0.4.1",
+    "mocha": "^2.3.4",
+    "should": "^8.0.2"
+  }
+}
