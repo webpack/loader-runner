@@ -287,9 +287,11 @@ describe("runLoaders", function() {
 	});
 	describe("getContext", function() {
 		var TESTS = [
+			["/", "/"],
 			["/path/file.js", "/path"],
 			["/some/longer/path/file.js", "/some/longer/path"],
 			["/file.js", "/"],
+			["C:\\", "C:\\"],
 			["C:\\file.js", "C:\\"],
 			["C:\\some\\path\\file.js", "C:\\some\\path"],
 			["C:\\path\\file.js", "C:\\path"],
