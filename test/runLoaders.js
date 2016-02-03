@@ -54,6 +54,23 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
+	it("should process a simple async loader when error allow to pass module info", function(done) {
+		runLoaders({
+			resource: path.resolve(fixtures, "resource.bin"),
+			loaders: [
+				path.resolve(fixtures, "simple-async-error-loader.js")
+			]
+		}, function(err, result) {
+			if(err) {
+				result.cacheable.should.be.eql(true);
+				result.fileDependencies.should.be.eql([
+					path.resolve(fixtures, "resource.bin")
+				]);
+				result.contextDependencies.should.be.eql([]);
+			}
+			done();
+		});
+	});
 	it("should process multiple simple loaders", function(done) {
 		runLoaders({
 			resource: path.resolve(fixtures, "resource.bin"),
