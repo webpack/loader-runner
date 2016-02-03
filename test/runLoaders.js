@@ -285,6 +285,37 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
+	it("should return dependencies even if resource is missing", function(done) {
+		runLoaders({
+			resource: path.resolve(fixtures, "missing.txt"),
+			loaders: [
+				path.resolve(fixtures, "pitch-dependencies-loader.js")
+			]
+		}, function(err, result) {
+			err.should.be.instanceOf(Error);
+			err.message.should.match(/ENOENT/i);
+			result.fileDependencies.should.be.eql([
+				"remainingRequest:" + path.resolve(fixtures, "missing.txt"),
+				path.resolve(fixtures, "missing.txt")
+			]);
+			done();
+		});
+	});
+	it("should return dependencies even if loader is failing", function(done) {
+		runLoaders({
+			resource: path.resolve(fixtures, "resource.bin"),
+			loaders: [
+				path.resolve(fixtures, "failing-loader.js")
+			]
+		}, function(err, result) {
+			err.should.be.instanceOf(Error);
+			err.message.should.match(/^resource$/i);
+			result.fileDependencies.should.be.eql([
+				path.resolve(fixtures, "resource.bin")
+			]);
+			done();
+		});
+	});
 	describe("getContext", function() {
 		var TESTS = [
 			["/", "/"],
