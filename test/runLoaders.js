@@ -177,6 +177,55 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
+	it("should have to correct keys in context (with options)", function(done) {
+		runLoaders({
+			resource: path.resolve(fixtures, "resource.bin") + "?query",
+			loaders: [{
+				loader: path.resolve(fixtures, "keys-loader.js"),
+				options: {
+					ident: "ident",
+					loader: "query"
+				}
+			}]
+		}, function(err, result) {
+			if(err) return done(err);
+			try {
+				JSON.parse(result.result[0]).should.be.eql({
+					context: fixtures,
+					resource: path.resolve(fixtures, "resource.bin") + "?query",
+					resourcePath: path.resolve(fixtures, "resource.bin"),
+					resourceQuery: "?query",
+					loaderIndex: 0,
+					query: {
+						ident: "ident",
+						loader: "query"
+					},
+					currentRequest: path.resolve(fixtures, "keys-loader.js") + "??ident!" +
+						path.resolve(fixtures, "resource.bin") + "?query",
+					remainingRequest: path.resolve(fixtures, "resource.bin") + "?query",
+					previousRequest: "",
+					request: path.resolve(fixtures, "keys-loader.js") + "??ident!" +
+						path.resolve(fixtures, "resource.bin") + "?query",
+					data: null,
+					loaders: [{
+						request: path.resolve(fixtures, "keys-loader.js") + "??ident",
+						path: path.resolve(fixtures, "keys-loader.js"),
+						query: "??ident",
+						options: {
+							ident: "ident",
+							loader: "query"
+						},
+						data: null,
+						pitchExecuted: true,
+						normalExecuted: true
+					}]
+				})
+			} catch(e) {
+				return done(e);
+			}
+			done();
+		});
+	});
 	it("should process raw loaders", function(done) {
 		runLoaders({
 			resource: path.resolve(fixtures, "bom.bin"),
