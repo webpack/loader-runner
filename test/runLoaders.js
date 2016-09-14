@@ -54,6 +54,23 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
+	it("should process a simple promise loader", function(done) {
+		runLoaders({
+			resource: path.resolve(fixtures, "resource.bin"),
+			loaders: [
+				path.resolve(fixtures, "simple-promise-loader.js")
+			]
+		}, function(err, result) {
+			if(err) return done(err);
+			result.result.should.be.eql(["resource-promise-simple"]);
+			result.cacheable.should.be.eql(true);
+			result.fileDependencies.should.be.eql([
+				path.resolve(fixtures, "resource.bin")
+			]);
+			result.contextDependencies.should.be.eql([]);
+			done();
+		});
+	});
 	it("should process multiple simple loaders", function(done) {
 		runLoaders({
 			resource: path.resolve(fixtures, "resource.bin"),
