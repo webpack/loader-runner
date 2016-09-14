@@ -125,6 +125,7 @@ describe("runLoaders", function() {
 			result.cacheable.should.be.eql(true);
 			result.fileDependencies.should.be.eql(["a", "b"]);
 			result.contextDependencies.should.be.eql(["c"]);
+			result.result.should.be.eql(["resource\n" + JSON.stringify(["a", "b"]) + JSON.stringify(["c"])]);
 			done();
 		});
 	});
