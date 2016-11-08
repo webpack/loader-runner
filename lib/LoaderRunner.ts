@@ -47,7 +47,7 @@ function dirname(path: string) {
 export interface Loader {
     path: string
     query: string
-    request: any
+    request: string
     options: any
     normal: any
     pitch: any
@@ -59,12 +59,12 @@ export interface Loader {
 
 function createLoaderObject(loader: {}) {
     const obj = <Loader>{
-        path: null,
-        query: null,
+        path: '',
+        query: '',
         options: null,
         normal: null,
         pitch: null,
-        raw: null,
+        raw: '',
         data: null,
         pitchExecuted: false,
         normalExecuted: false
@@ -294,10 +294,10 @@ export interface RunLoaderOption {
     resource: string
     loaders: any[]
     context: any
-    readResource: (filename: string, callback: (err: NodeJS.ErrnoException, data: Buffer) => void) => void
+    readResource: (filename: string, callback: (err: NodeJS.ErrnoException | null, data: Buffer) => void) => void
 }
 
-export function runLoaders(options: RunLoaderOption, callback: (err: NodeJS.ErrnoException, result) => any) {
+export function runLoaders(options: RunLoaderOption, callback: (err: NodeJS.ErrnoException | null, result) => any) {
     // read options
     const resource = options.resource || '';
     let loaders = options.loaders || [];
@@ -312,8 +312,8 @@ export function runLoaders(options: RunLoaderOption, callback: (err: NodeJS.Errn
 
     // execution state
     let requestCacheable = true;
-    const fileDependencies = [];
-    const contextDependencies = [];
+    const fileDependencies: string[] = [];
+    const contextDependencies: string[] = [];
 
     // prepare loader objects
     loaders = loaders.map(createLoaderObject);

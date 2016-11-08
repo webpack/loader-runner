@@ -9,7 +9,7 @@ declare module 'loader-runner' {
     export interface Loader {
         path: string;
         query: string;
-        request: any;
+        request: string;
         options: any;
         normal: any;
         pitch: any;
@@ -25,11 +25,12 @@ declare module 'loader-runner' {
         resource: string;
         loaders: any[];
         context: any;
-        readResource: (filename: string, callback: (err: NodeJS.ErrnoException, data: Buffer) => void) => void;
+        readResource: (filename: string, callback: (err: NodeJS.ErrnoException | null, data: Buffer) => void) => void;
     }
+
     export function runLoaders(
         options: RunLoaderOption,
-        callback: (err: NodeJS.ErrnoException, result) => any
+        callback: (err: NodeJS.ErrnoException | null, result: any) => any
     ): void;
 }
 
