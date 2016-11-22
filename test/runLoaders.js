@@ -383,6 +383,29 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
+	it("should load a loader using System.import and process", function(done) {
+		global.System = {
+			import: function(moduleId) {
+				return Promise.resolve(require(moduleId));
+			}
+		};
+		runLoaders({
+			resource: path.resolve(fixtures, "resource.bin"),
+			loaders: [
+				path.resolve(fixtures, "simple-loader.js")
+			]
+		}, function(err, result) {
+			if(err) return done(err);
+			result.result.should.be.eql(["resource-simple"]);
+			result.cacheable.should.be.eql(true);
+			result.fileDependencies.should.be.eql([
+				path.resolve(fixtures, "resource.bin")
+			]);
+			result.contextDependencies.should.be.eql([]);
+			done();
+		});
+		delete global.System;
+	});
 	describe("getContext", function() {
 		var TESTS = [
 			["/", "/"],
