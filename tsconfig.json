@@ -7,6 +7,7 @@
       "es2016"
     ],
     "declaration": true,
+    "noImplicitAny": true,
     "declarationDir": "typings"
   },
   "exclude": [

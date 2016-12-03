@@ -7,6 +7,65 @@ import fs = require('fs');
 import loadLoader = require('./loadLoader');
 const readFile = fs.readFile.bind(fs);
 
+export interface LoaderObject {
+    path: string
+    query: string
+    request: string
+    options: any
+    normal: null | ((request: string) => string)
+    pitch: null | ((request: string) => string)
+    raw: string
+    data: any
+    pitchExecuted: boolean
+    normalExecuted: boolean
+}
+
+interface LoaderProcessOption {
+    resourceBuffer: Buffer | null
+    readResource: (path: string, callback: (err: NodeJS.ErrnoException | null, buf: Buffer | null) => void) => void
+}
+
+export interface RunLoaderOption {
+    resource: string
+    loaders: any[]
+    context: any
+    readResource: (filename: string, callback: (err: NodeJS.ErrnoException | null, data: Buffer | null) => void) => void
+}
+
+export interface RunLoaderResult {
+    result?: (Buffer | null)[]
+    resourceBuffer?: Buffer | null
+    cacheable: boolean
+    fileDependencies: string[]
+    contextDependencies: string[]
+}
+
+export interface ExtendedLoaderContext {
+    context: string | null
+    loaderIndex: number
+    loaders: LoaderObject[]
+    resourcePath: string | undefined
+    resourceQuery: string | undefined
+    async: (() => (()=> void) | undefined) | null
+    callback: (()=> void) | null
+    cacheable: (flag: boolean) => void
+    dependency: (file: string) => void
+    addDependency: (file: string) => void
+    addContextDependency: (context: string) => void
+    getDependencies: () => string[]
+    getContextDependencies: () => string[]
+    clearDependencies: () => void
+    resource: string
+    request: string
+    remainingRequest: string
+    currentRequest: string
+    previousRequest: string
+    query: {
+        [key: string]: any
+    } | string
+    data: any
+}
+
 function utf8BufferToString(buf: Buffer) {
     const str = buf.toString('utf-8');
     if (str.charCodeAt(0) === 0xFEFF) {
@@ -17,7 +76,7 @@ function utf8BufferToString(buf: Buffer) {
     }
 }
 
-function splitQuery(req: string) {
+function splitQuery(req: string): [string, string] {
     const i = req.indexOf('?');
     if (i < 0) {
         return [req, ''];
@@ -44,21 +103,8 @@ function dirname(path: string) {
     return path.substr(0, idx);
 }
 
-export interface Loader {
-    path: string
-    query: string
-    request: string
-    options: any
-    normal: any
-    pitch: any
-    raw: string
-    data: any
-    pitchExecuted: boolean
-    normalExecuted: boolean
-}
-
 function createLoaderObject(loader: {}) {
-    const obj = <Loader>{
+    const obj = <LoaderObject>{
         path: '',
         query: '',
         options: null,
@@ -105,14 +151,19 @@ function createLoaderObject(loader: {}) {
             }
         }
     });
-    obj.request = loader;
+    obj.request = loader as string;
     if (Object.preventExtensions) {
         Object.preventExtensions(obj);
     }
     return obj;
 }
 
-function runSyncOrAsync(fn: (...args: any[]) => any, context: any, args: any[], callback: (...args: any[]) => any) {
+function runSyncOrAsync(
+    fn: (request: string) => string,
+    context: ExtendedLoaderContext,
+    args: (Buffer | string | null)[],
+    callback: (err?: Error | null, ...args: any[]) => any
+) {
     let isSync = true;
     let isDone = false;
     let isError = false; // internal error
@@ -153,9 +204,10 @@ function runSyncOrAsync(fn: (...args: any[]) => any, context: any, args: any[], 
                 return callback();
             }
             if (result && typeof result === 'object' && typeof result.then === 'function') {
-                return result.catch(callback).then(r => {
-                    callback(null, r);
-                });
+                return result.catch(callback)
+                    .then((r: Buffer | null) => {
+                        callback(null, r);
+                    });
             }
             return callback(null, result);
         }
@@ -180,7 +232,7 @@ function runSyncOrAsync(fn: (...args: any[]) => any, context: any, args: any[], 
     }
 }
 
-function convertArgs(args: (string | Buffer)[], raw) {
+function convertArgs(args: (string | Buffer | null)[], raw: string) {
     if (!raw && Buffer.isBuffer(args[0])) {
         args[0] = utf8BufferToString(<Buffer>args[0]);
     }
@@ -189,7 +241,11 @@ function convertArgs(args: (string | Buffer)[], raw) {
     }
 }
 
-function iteratePitchingLoaders(options, loaderContext, callback: (err, result?) => any) {
+function iteratePitchingLoaders(
+    options: LoaderProcessOption,
+    loaderContext: ExtendedLoaderContext,
+    callback: (err: Error | null, result?: (Buffer | null)[]) => any
+): void {
     // abort after last loader
     if (loaderContext.loaderIndex >= loaderContext.loaders.length) {
         return processResource(options, loaderContext, callback);
@@ -213,28 +269,32 @@ function iteratePitchingLoaders(options, loaderContext, callback: (err, result?)
         if (!fn) {
             return iteratePitchingLoaders(options, loaderContext, callback);
         }
-
-        runSyncOrAsync(fn, loaderContext, [
-            loaderContext.remainingRequest,
-            loaderContext.previousRequest,
-            currentLoaderObject.data = {}
-        ], function (err) {
-            if (err) {
-                return callback(err);
-            }
-            const args = Array.prototype.slice.call(arguments, 1);
-            if (args.length > 0) {
-                loaderContext.loaderIndex--;
-                iterateNormalLoaders(options, loaderContext, args, callback);
-            }
-            else {
-                iteratePitchingLoaders(options, loaderContext, callback);
-            }
-        });
+        currentLoaderObject.data = {}
+        runSyncOrAsync(
+            fn,
+            loaderContext,
+            [
+                loaderContext.remainingRequest,
+                loaderContext.previousRequest,
+                currentLoaderObject.data
+            ],
+            function (err) {
+                if (err) {
+                    return callback(err);
+                }
+                const args = Array.prototype.slice.call(arguments, 1);
+                if (args.length > 0) {
+                    loaderContext.loaderIndex--;
+                    iterateNormalLoaders(options, loaderContext, args, callback);
+                }
+                else {
+                    iteratePitchingLoaders(options, loaderContext, callback);
+                }
+            });
     });
 }
 
-function processResource(options, loaderContext, callback: (err) => any) {
+function processResource(options: LoaderProcessOption, loaderContext: ExtendedLoaderContext, callback: (err: Error) => any) {
     // set loader index to last loader
     loaderContext.loaderIndex = loaderContext.loaders.length - 1;
 
@@ -254,7 +314,12 @@ function processResource(options, loaderContext, callback: (err) => any) {
     }
 }
 
-function iterateNormalLoaders(options, loaderContext, args: any[], callback: (err, args?: any[]) => any) {
+function iterateNormalLoaders(
+    options: LoaderProcessOption,
+    loaderContext: ExtendedLoaderContext,
+    args: (Buffer | null)[],
+    callback: (err: Error | null, args?: (Buffer | null)[]) => any
+): any {
     if (loaderContext.loaderIndex < 0) {
         return callback(null, args);
     }
@@ -290,18 +355,14 @@ export function getContext(resource: string) {
     return dirname(splitted[0]);
 }
 
-export interface RunLoaderOption {
-    resource: string
-    loaders: any[]
-    context: any
-    readResource: (filename: string, callback: (err: NodeJS.ErrnoException | null, data: Buffer) => void) => void
-}
-
-export function runLoaders(options: RunLoaderOption, callback: (err: NodeJS.ErrnoException | null, result) => any) {
+export function runLoaders(
+    options: RunLoaderOption,
+    callback: (err: NodeJS.ErrnoException | null, result: RunLoaderResult) => any
+) {
     // read options
     const resource = options.resource || '';
     let loaders = options.loaders || [];
-    const loaderContext = options.context || {};
+    const loaderContext: ExtendedLoaderContext = options.context || {};
     const readResource = options.readResource || readFile;
 
     //
@@ -325,15 +386,15 @@ export function runLoaders(options: RunLoaderOption, callback: (err: NodeJS.Errn
     loaderContext.resourceQuery = resourceQuery;
     loaderContext.async = null;
     loaderContext.callback = null;
-    loaderContext.cacheable = function cacheable(flag) {
+    loaderContext.cacheable = function cacheable(flag: boolean) {
         if (flag === false) {
             requestCacheable = false;
         }
     };
-    loaderContext.dependency = loaderContext.addDependency = function addDependency(file) {
+    loaderContext.dependency = loaderContext.addDependency = function addDependency(file: string) {
         fileDependencies.push(file);
     };
-    loaderContext.addContextDependency = function addContextDependency(context) {
+    loaderContext.addContextDependency = function addContextDependency(context: string) {
         contextDependencies.push(context);
     };
     loaderContext.getDependencies = function getDependencies() {
@@ -364,7 +425,9 @@ export function runLoaders(options: RunLoaderOption, callback: (err: NodeJS.Errn
     Object.defineProperty(loaderContext, 'request', {
         enumerable: true,
         get() {
-            return loaderContext.loaders.map(o => o.request).concat(loaderContext.resource || '').join('!');
+            return loaderContext.loaders.map(o => o.request)
+                .concat(loaderContext.resource || '')
+                .join('!');
         }
     });
     Object.defineProperty(loaderContext, 'remainingRequest', {
@@ -417,7 +480,7 @@ export function runLoaders(options: RunLoaderOption, callback: (err: NodeJS.Errn
         resourceBuffer: null,
         readResource
     };
-    iteratePitchingLoaders(processOptions, loaderContext, (err, result) => {
+    iteratePitchingLoaders(processOptions, loaderContext, (err: Error, result: (Buffer | null)[]) => {
         if (err) {
             return callback(err, {
                 cacheable: requestCacheable,

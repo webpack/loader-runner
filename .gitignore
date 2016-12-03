@@ -2,3 +2,4 @@
 /coverage
 .vscode
 .idea
+yarn.lock

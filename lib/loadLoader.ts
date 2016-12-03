@@ -1,14 +1,18 @@
-export = function loadLoader(loader, callback: (err?) => any) {
+import { LoaderObject } from './LoaderRunner'
+
+export = function loadLoader(loader: LoaderObject, callback: (err?: Error) => any) {
     if (typeof System === 'object' && typeof System.import === 'function') {
-        System.import(loader.path).catch(callback).then(module => {
-            loader.normal = module.default;
-            loader.pitch = module.pitch;
-            loader.raw = module.raw;
-            if (typeof loader.normal !== 'function' && typeof loader.pitch !== 'function') {
-                throw new Error(`Module '${loader.path}' is not a loader (must have normal or pitch function)`);
-            }
-            callback();
-        });
+        System.import(loader.path)
+            .catch(callback)
+            .then(module => {
+                loader.normal = module.default;
+                loader.pitch = module.pitch;
+                loader.raw = module.raw;
+                if (typeof loader.normal !== 'function' && typeof loader.pitch !== 'function') {
+                    throw new Error(`Module '${loader.path}' is not a loader (must have normal or pitch function)`);
+                }
+                callback();
+            });
     }
     else {
         let module
@@ -30,6 +34,7 @@ export = function loadLoader(loader, callback: (err?) => any) {
             }
             return callback(e);
         }
+        // todo: as loader is not ab object, how can it has path?
         if (typeof loader !== 'function' && typeof loader !== 'object') {
             throw new Error(`Module '${loader.path}' is not a loader (export function or es6 module))`);
         }
