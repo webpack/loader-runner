@@ -11,7 +11,8 @@
     "test": "mocha --reporter spec",
     "precover": "npm run lint && npm run beautify-lint",
     "cover": "istanbul cover node_modules/mocha/bin/_mocha",
-    "travis": "npm run cover -- --report lcovonly"
+    "travis": "npm run cover -- --report lcovonly",
+    "build": "tsc -p . || true"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,8 @@
   },
   "homepage": "https://github.com/webpack/loader-runner#readme",
   "devDependencies": {
+    "@types/node": "^6.0.46",
+    "@types/systemjs": "^0.19.31",
     "beautify-lint": "^1.0.4",
     "codecov.io": "^0.1.6",
     "coveralls": "^2.11.6",
@@ -42,6 +45,8 @@
     "eslint-plugin-nodeca": "^1.0.3",
     "istanbul": "^0.4.1",
     "mocha": "^2.3.4",
-    "should": "^8.0.2"
+    "should": "^8.0.2",
+    "tslint": "^4.0.0",
+    "typescript": "^2.0.0"
   }
 }
