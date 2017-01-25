@@ -1,4 +1,4 @@
-var should = require("should");
+var should = require("should"); // eslint-disable-line
 var path = require("path");
 var runLoaders = require("../").runLoaders;
 var getContext = require("../").getContext;
@@ -11,7 +11,7 @@ describe("runLoaders", function() {
 			resource: path.resolve(fixtures, "resource.bin")
 		}, function(err, result) {
 			if(err) return done(err);
-			result.result.should.be.eql([Buffer.from("resource", "utf-8")]);
+			result.result.should.be.eql([new Buffer("resource", "utf-8")]); // eslint-disable-line
 			result.cacheable.should.be.eql(true);
 			result.fileDependencies.should.be.eql([
 				path.resolve(fixtures, "resource.bin")
