@@ -1,4 +1,4 @@
-var should = require("should"); // eslint-disable-line
+require("should");
 var path = require("path");
 var runLoaders = require("../").runLoaders;
 var getContext = require("../").getContext;
