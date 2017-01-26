@@ -302,9 +302,13 @@ describe("runLoaders", function() {
 	it("should have to correct keys in context with only resource query", function(done) {
 		runLoaders({
 			resource: "?query",
-			loaders: [
-				path.resolve(fixtures, "keys-loader.js"),
-			]
+			loaders: [{
+				loader: path.resolve(fixtures, "keys-loader.js"),
+				options: {
+					ok: true
+				},
+				ident: "my-ident"
+			}]
 		}, function(err, result) {
 			if(err) return done(err);
 			try {
@@ -314,17 +318,23 @@ describe("runLoaders", function() {
 					resourcePath: "",
 					resourceQuery: "?query",
 					loaderIndex: 0,
-					query: "",
-					currentRequest: path.resolve(fixtures, "keys-loader.js") + "!?query",
+					query: {
+						ok: true
+					},
+					currentRequest: path.resolve(fixtures, "keys-loader.js") + "??my-ident!?query",
 					remainingRequest: "?query",
 					previousRequest: "",
-					request: path.resolve(fixtures, "keys-loader.js") + "!" +
+					request: path.resolve(fixtures, "keys-loader.js") + "??my-ident!" +
 						"?query",
 					data: null,
 					loaders: [{
-						request: path.resolve(fixtures, "keys-loader.js"),
+						request: path.resolve(fixtures, "keys-loader.js") + "??my-ident",
 						path: path.resolve(fixtures, "keys-loader.js"),
-						query: "",
+						query: "??my-ident",
+						ident: "my-ident",
+						options: {
+							ok: true
+						},
 						data: null,
 						pitchExecuted: true,
 						normalExecuted: true
@@ -379,6 +389,26 @@ describe("runLoaders", function() {
 			err.message.should.match(/^resource$/i);
 			result.fileDependencies.should.be.eql([
 				path.resolve(fixtures, "resource.bin")
+			]);
+			done();
+		});
+	});
+	it("should use an ident if passed", function(done) {
+		runLoaders({
+			resource: path.resolve(fixtures, "resource.bin"),
+			loaders: [{
+				loader: path.resolve(fixtures, "pitching-loader.js")
+			}, {
+				loader: path.resolve(fixtures, "simple-loader.js"),
+				options: {
+					f: function() {}
+				},
+				ident: "my-ident"
+			}]
+		}, function(err, result) {
+			if(err) return done(err);
+			result.result.should.be.eql([
+				path.resolve(fixtures, "simple-loader.js") + "??my-ident!" + path.resolve(fixtures, "resource.bin") + ":"
 			]);
 			done();
 		});
