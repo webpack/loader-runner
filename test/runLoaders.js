@@ -241,6 +241,18 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
+	it("should process loaders depend on context.exec", function(done) {
+		runLoaders({
+			resource: path.resolve(fixtures, "simple-resource.js"),
+			loaders: [
+				path.resolve(fixtures, "exec-loader.js")
+			]
+		}, function(err, result) {
+			if(err) return done(err);
+			result.result[0].should.be.eql("\"exec\"");
+			done();
+		});
+	});
 	it("should process omit BOM on string convertion", function(done) {
 		runLoaders({
 			resource: path.resolve(fixtures, "bom.bin"),
