@@ -241,7 +241,7 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
-	it("should process omit BOM on string convertion", function(done) {
+	it("should process omit BOM on string conversion", function(done) {
 		runLoaders({
 			resource: path.resolve(fixtures, "bom.bin"),
 			loaders: [
