@@ -114,6 +114,27 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
+	it("should interpret explicit `undefined` values from async 'pitch' loaders", function(done) {
+		runLoaders({
+			resource: path.resolve(fixtures, "resource.bin"),
+			loaders: [
+				path.resolve(fixtures, "simple-loader.js"),
+				path.resolve(fixtures, "pitch-async-undef-loader.js"),
+				path.resolve(fixtures, "pitch-promise-undef-loader.js")
+			]
+		}, function(err, result) {
+			if(err) return done(err);
+			result.result.should.be.eql([
+				"resource-simple"
+			]);
+			result.cacheable.should.be.eql(true);
+			result.fileDependencies.should.be.eql([
+				path.resolve(fixtures, "resource.bin")
+			]);
+			result.contextDependencies.should.be.eql([]);
+			done();
+		});
+	});
 	it("should be possible to add dependencies", function(done) {
 		runLoaders({
 			resource: path.resolve(fixtures, "resource.bin"),
