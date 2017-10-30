@@ -153,7 +153,6 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
-
 	it("should be possible to add dependencies", function(done) {
 		runLoaders({
 			resource: path.resolve(fixtures, "resource.bin"),
