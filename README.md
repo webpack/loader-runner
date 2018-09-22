@@ -28,7 +28,7 @@ runLoaders({
 	// The raw resource as Buffer (useful for SourceMaps)
 
 	// result.cacheable: Bool
-	// Is the result cacheable or do it require reexecution?
+	// Is the result cacheable or does it require reexecution?
 
 	// result.fileDependencies: String[]
 	// An array of paths (files) on which the result depends on
