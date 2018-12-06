@@ -1,8 +1,10 @@
 sudo: false
 language: node_js
 node_js:
-  - "4.0"
-  - "5.0"
+  - "4"
+  - "6"
+  - "8"
+  - "10"
   - node
 script: npm run travis
 
