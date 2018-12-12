@@ -1,6 +1,6 @@
-exports.pitch = function(remaingRequest, previousRequest, data) {
+exports.pitch = function(remainingRequest, previousRequest, data) {
 	return [
-		remaingRequest,
+		remainingRequest,
 		previousRequest
 	].join(":");
 };
