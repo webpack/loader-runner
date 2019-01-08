@@ -417,21 +417,6 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
-	it("should return dependencies when loader throws error", function(done) {
-		runLoaders({
-			resource: path.resolve(fixtures, "resource.bin"),
-			loaders: [
-				path.resolve(fixtures, "throws-error-loader.js")
-			]
-		}, function(err, result) {
-			err.should.be.instanceOf(Error);
-			err.message.should.match(/^resource$/i);
-			result.fileDependencies.should.be.eql([
-				path.resolve(fixtures, "resource.bin")
-			]);
-			done();
-		});
-	});
 	it("should not return dependencies when loader not found", function(done) {
 		runLoaders({
 			resource: path.resolve(fixtures, "resource.bin"),
@@ -484,7 +469,7 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
-	it("should return dependencies when loader throws", function(done) {
+	it("should return dependencies when loader throws error", function(done) {
 		runLoaders({
 			resource: path.resolve(fixtures, "resource.bin"),
 			loaders: [
