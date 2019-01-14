@@ -428,7 +428,7 @@ describe("runLoaders", function() {
 			err.code.should.be.eql("MODULE_NOT_FOUND");
 			err.message.should.match(/does-not-exist-loader.js\'$/i);
 			result.should.be.eql({
-				cacheable: true,
+				cacheable: false,
 				fileDependencies: [],
 				contextDependencies: []
 			});
