@@ -445,6 +445,24 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
+	it("should return dependencies when loader rejects promise", function(done) {
+		var once = true;
+		runLoaders({
+			resource: path.resolve(fixtures, "resource.bin"),
+			loaders: [
+				path.resolve(fixtures, "promise-error-loader.js")
+			]
+		}, function(err, result) {
+			if(!once) return done(new Error("should not be called twice"));
+			once = false;
+			err.should.be.instanceOf(Error);
+			err.message.should.match(/^resource$/i);
+			result.fileDependencies.should.be.eql([
+				path.resolve(fixtures, "resource.bin")
+			]);
+			done();
+		});
+	});
 	it("should use an ident if passed", function(done) {
 		runLoaders({
 			resource: path.resolve(fixtures, "resource.bin"),
