@@ -401,7 +401,7 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
-	it("should return dependencies even if resource is missing", function(done) {
+	it("should return dependencies when resource not found", function(done) {
 		runLoaders({
 			resource: path.resolve(fixtures, "missing.txt"),
 			loaders: [
@@ -417,11 +417,63 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
-	it("should return dependencies even if loader is failing", function(done) {
+	it("should not return dependencies when loader not found", function(done) {
 		runLoaders({
 			resource: path.resolve(fixtures, "resource.bin"),
 			loaders: [
-				path.resolve(fixtures, "failing-loader.js")
+				path.resolve(fixtures, "does-not-exist-loader.js")
+			]
+		}, function(err, result) {
+			err.should.be.instanceOf(Error);
+			err.code.should.be.eql("MODULE_NOT_FOUND");
+			err.message.should.match(/does-not-exist-loader.js\'$/i);
+			result.should.be.eql({
+				cacheable: false,
+				fileDependencies: [],
+				contextDependencies: []
+			});
+			done();
+		});
+	});
+	it("should not return dependencies when loader is empty object", function(done) {
+		runLoaders({
+			resource: path.resolve(fixtures, "resource.bin"),
+			loaders: [
+				path.resolve(fixtures, "module-exports-object-loader.js")
+			]
+		}, function(err, result) {
+			err.should.be.instanceOf(Error);
+			err.message.should.match(/module-exports-object-loader.js' is not a loader \(must have normal or pitch function\)$/);
+			result.should.be.eql({
+				cacheable: false,
+				fileDependencies: [],
+				contextDependencies: []
+			});
+			done();
+		});
+	});
+	it("should not return dependencies when loader is otherwise invalid (string)", function(done) {
+		runLoaders({
+			resource: path.resolve(fixtures, "resource.bin"),
+			loaders: [
+				path.resolve(fixtures, "module-exports-string-loader.js")
+			]
+		}, function(err, result) {
+			err.should.be.instanceOf(Error);
+			err.message.should.match(/module-exports-string-loader.js' is not a loader \(export function or es6 module\)$/);
+			result.should.be.eql({
+				cacheable: false,
+				fileDependencies: [],
+				contextDependencies: []
+			});
+			done();
+		});
+	});
+	it("should return dependencies when loader throws error", function(done) {
+		runLoaders({
+			resource: path.resolve(fixtures, "resource.bin"),
+			loaders: [
+				path.resolve(fixtures, "throws-error-loader.js")
 			]
 		}, function(err, result) {
 			err.should.be.instanceOf(Error);
