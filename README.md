@@ -1,6 +1,7 @@
 # loader-runner
 
 ``` js
+import fs from "fs";
 import { runLoaders } from "loader-runner";
 
 runLoaders({
@@ -14,9 +15,8 @@ runLoaders({
 	context: { minimize: true },
 	// Additional loader context which is used as base context
 
-	readResource: fs.readFile.bind(fs)
-	// A function to read the resource
-	// Must have signature function(path, function(err, buffer))
+	// readFile is used
+	inputFileSystem: fs,
 
 }, function(err, result) {
 	// err: Error?
@@ -37,6 +37,3 @@ runLoaders({
 	// An array of paths (directories) on which the result depends on
 })
 ```
-
-More documentation following...
-
