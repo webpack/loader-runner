@@ -164,7 +164,8 @@ describe("runLoaders", function() {
 			result.cacheable.should.be.eql(true);
 			result.fileDependencies.should.be.eql(["a", "b"]);
 			result.contextDependencies.should.be.eql(["c"]);
-			result.result.should.be.eql(["resource\n" + JSON.stringify(["a", "b"]) + JSON.stringify(["c"])]);
+			result.missingDependencies.should.be.eql(["d"]);
+			result.result.should.be.eql(["resource\n" + JSON.stringify(["a", "b"]) + JSON.stringify(["c"]) + JSON.stringify(["d"])]);
 			done();
 		});
 	});
@@ -430,7 +431,8 @@ describe("runLoaders", function() {
 			result.should.be.eql({
 				cacheable: false,
 				fileDependencies: [],
-				contextDependencies: []
+				contextDependencies: [],
+				missingDependencies: []
 			});
 			done();
 		});
@@ -447,7 +449,8 @@ describe("runLoaders", function() {
 			result.should.be.eql({
 				cacheable: false,
 				fileDependencies: [],
-				contextDependencies: []
+				contextDependencies: [],
+				missingDependencies: []
 			});
 			done();
 		});
@@ -464,7 +467,8 @@ describe("runLoaders", function() {
 			result.should.be.eql({
 				cacheable: false,
 				fileDependencies: [],
-				contextDependencies: []
+				contextDependencies: [],
+				missingDependencies: []
 			});
 			done();
 		});
