@@ -607,6 +607,28 @@ describe("runLoaders", function() {
 		});
 		delete global.System;
 	});
+	if(+process.versions.modules >= 83) {
+		it("should load a loader using import()", function(done) {
+			runLoaders({
+				resource: path.resolve(fixtures, "resource.bin"),
+				loaders: [
+					{
+						loader: path.resolve(fixtures, "esm-loader.mjs"),
+						type: "module"
+					}
+				]
+			}, function(err, result) {
+				if(err) return done(err);
+				result.result.should.be.eql(["resource-esm"]);
+				result.cacheable.should.be.eql(true);
+				result.fileDependencies.should.be.eql([
+					path.resolve(fixtures, "resource.bin")
+				]);
+				result.contextDependencies.should.be.eql([]);
+				done();
+			});
+		});
+	}
 	describe("getContext", function() {
 		var TESTS = [
 			["/", "/"],
