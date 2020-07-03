@@ -171,7 +171,7 @@ describe("runLoaders", function() {
 	});
 	it("should have to correct keys in context", function(done) {
 		runLoaders({
-			resource: path.resolve(fixtures, "resource.bin") + "?query",
+			resource: path.resolve(fixtures, "resource.bin") + "?query#frag",
 			loaders: [
 				path.resolve(fixtures, "keys-loader.js") + "?loader-query",
 				path.resolve(fixtures, "simple-loader.js")
@@ -181,25 +181,27 @@ describe("runLoaders", function() {
 			try {
 				JSON.parse(result.result[0]).should.be.eql({
 					context: fixtures,
-					resource: path.resolve(fixtures, "resource.bin") + "?query",
+					resource: path.resolve(fixtures, "resource.bin") + "?query#frag",
 					resourcePath: path.resolve(fixtures, "resource.bin"),
 					resourceQuery: "?query",
+					resourceFragment: "#frag",
 					loaderIndex: 0,
 					query: "?loader-query",
 					currentRequest: path.resolve(fixtures, "keys-loader.js") + "?loader-query!" +
 						path.resolve(fixtures, "simple-loader.js") + "!" +
-						path.resolve(fixtures, "resource.bin") + "?query",
+						path.resolve(fixtures, "resource.bin") + "?query#frag",
 					remainingRequest: path.resolve(fixtures, "simple-loader.js") + "!" +
-						path.resolve(fixtures, "resource.bin") + "?query",
+						path.resolve(fixtures, "resource.bin") + "?query#frag",
 					previousRequest: "",
 					request: path.resolve(fixtures, "keys-loader.js") + "?loader-query!" +
 						path.resolve(fixtures, "simple-loader.js") + "!" +
-						path.resolve(fixtures, "resource.bin") + "?query",
+						path.resolve(fixtures, "resource.bin") + "?query#frag",
 					data: null,
 					loaders: [{
 						request: path.resolve(fixtures, "keys-loader.js") + "?loader-query",
 						path: path.resolve(fixtures, "keys-loader.js"),
 						query: "?loader-query",
+						fragment: "",
 						data: null,
 						pitchExecuted: true,
 						normalExecuted: true
@@ -207,6 +209,7 @@ describe("runLoaders", function() {
 						request: path.resolve(fixtures, "simple-loader.js"),
 						path: path.resolve(fixtures, "simple-loader.js"),
 						query: "",
+						fragment: "",
 						data: null,
 						pitchExecuted: true,
 						normalExecuted: true
@@ -236,6 +239,7 @@ describe("runLoaders", function() {
 					resource: path.resolve(fixtures, "resource.bin") + "?query",
 					resourcePath: path.resolve(fixtures, "resource.bin"),
 					resourceQuery: "?query",
+					resourceFragment: "",
 					loaderIndex: 0,
 					query: {
 						ident: "ident",
@@ -252,6 +256,7 @@ describe("runLoaders", function() {
 						request: path.resolve(fixtures, "keys-loader.js") + "??ident",
 						path: path.resolve(fixtures, "keys-loader.js"),
 						query: "??ident",
+						fragment: "",
 						options: {
 							ident: "ident",
 							loader: "query"
@@ -319,6 +324,7 @@ describe("runLoaders", function() {
 						request: path.resolve(fixtures, "identity-loader.js"),
 						path: path.resolve(fixtures, "identity-loader.js"),
 						query: "",
+						fragment: "",
 						data: {
 							identity: true
 						},
@@ -328,6 +334,7 @@ describe("runLoaders", function() {
 						request: path.resolve(fixtures, "keys-loader.js"),
 						path: path.resolve(fixtures, "keys-loader.js"),
 						query: "",
+						fragment: "",
 						data: null,
 						pitchExecuted: true,
 						normalExecuted: true
@@ -357,6 +364,7 @@ describe("runLoaders", function() {
 					resource: "?query",
 					resourcePath: "",
 					resourceQuery: "?query",
+					resourceFragment: "",
 					loaderIndex: 0,
 					query: {
 						ok: true
@@ -371,6 +379,56 @@ describe("runLoaders", function() {
 						request: path.resolve(fixtures, "keys-loader.js") + "??my-ident",
 						path: path.resolve(fixtures, "keys-loader.js"),
 						query: "??my-ident",
+						fragment: "",
+						ident: "my-ident",
+						options: {
+							ok: true
+						},
+						data: null,
+						pitchExecuted: true,
+						normalExecuted: true
+					}]
+				});
+			} catch(e) {
+				return done(e);
+			}
+			done();
+		});
+	});
+	it("should have to correct keys in context with only resource fragment", function(done) {
+		runLoaders({
+			resource: "#fragment",
+			loaders: [{
+				loader: path.resolve(fixtures, "keys-loader.js"),
+				options: {
+					ok: true
+				},
+				ident: "my-ident"
+			}]
+		}, function(err, result) {
+			if(err) return done(err);
+			try {
+				JSON.parse(result.result[0]).should.be.eql({
+					context: null,
+					resource: "#fragment",
+					resourcePath: "",
+					resourceQuery: "",
+					resourceFragment: "#fragment",
+					loaderIndex: 0,
+					query: {
+						ok: true
+					},
+					currentRequest: path.resolve(fixtures, "keys-loader.js") + "??my-ident!#fragment",
+					remainingRequest: "#fragment",
+					previousRequest: "",
+					request: path.resolve(fixtures, "keys-loader.js") + "??my-ident!" +
+						"#fragment",
+					data: null,
+					loaders: [{
+						request: path.resolve(fixtures, "keys-loader.js") + "??my-ident",
+						path: path.resolve(fixtures, "keys-loader.js"),
+						query: "??my-ident",
+						fragment: "",
 						ident: "my-ident",
 						options: {
 							ok: true
