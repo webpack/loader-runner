@@ -629,16 +629,79 @@ describe("runLoaders", function() {
 			});
 		});
 	}
+	it("should support escaping in resource", function(done) {
+		runLoaders({
+			resource: path.resolve(fixtures, "res\0#ource.bin")
+		}, function(err, result) {
+			if(err) return done(err);
+			result.result.should.be.eql([Buffer.from("resource", "utf-8")]);
+			result.cacheable.should.be.eql(true);
+			result.fileDependencies.should.be.eql([
+				path.resolve(fixtures, "res#ource.bin")
+			]);
+			result.contextDependencies.should.be.eql([]);
+			done();
+		});
+	});
+	it("should have to correct keys in context when using escaping", function(done) {
+		runLoaders({
+			resource: path.resolve(fixtures, "res\0#ource.bin") + "?query\0#frag",
+			loaders: [
+				path.resolve(fixtures, "keys-loader.js") + "?loader\0#query"
+			]
+		}, function(err, result) {
+			if(err) return done(err);
+			try {
+				JSON.parse(result.result[0]).should.be.eql({
+					context: fixtures,
+					resource: path.resolve(fixtures, "res\0#ource.bin") + "?query\0#frag",
+					resourcePath: path.resolve(fixtures, "res#ource.bin"),
+					resourceQuery: "?query#frag",
+					resourceFragment: "",
+					loaderIndex: 0,
+					query: "?loader#query",
+					currentRequest: path.resolve(fixtures, "keys-loader.js") + "?loader\0#query!" +
+						path.resolve(fixtures, "res\0#ource.bin") + "?query\0#frag",
+					remainingRequest: path.resolve(fixtures, "res\0#ource.bin") + "?query\0#frag",
+					previousRequest: "",
+					request: path.resolve(fixtures, "keys-loader.js") + "?loader\0#query!" +
+						path.resolve(fixtures, "res\0#ource.bin") + "?query\0#frag",
+					data: null,
+					loaders: [{
+						request: path.resolve(fixtures, "keys-loader.js") + "?loader\0#query",
+						path: path.resolve(fixtures, "keys-loader.js"),
+						query: "?loader#query",
+						fragment: "",
+						data: null,
+						pitchExecuted: true,
+						normalExecuted: true
+					}]
+				});
+			} catch(e) {
+				return done(e);
+			}
+			done();
+		});
+	});
+
 	describe("getContext", function() {
 		var TESTS = [
 			["/", "/"],
 			["/path/file.js", "/path"],
+			["/path/file.js#fragment", "/path"],
+			["/path/file.js?query", "/path"],
+			["/path/file.js?query#fragment", "/path"],
+			["/path/\0#/file.js", "/path/#"],
 			["/some/longer/path/file.js", "/some/longer/path"],
 			["/file.js", "/"],
 			["C:\\", "C:\\"],
 			["C:\\file.js", "C:\\"],
 			["C:\\some\\path\\file.js", "C:\\some\\path"],
 			["C:\\path\\file.js", "C:\\path"],
+			["C:\\path\\file.js#fragment", "C:\\path"],
+			["C:\\path\\file.js?query", "C:\\path"],
+			["C:\\path\\file.js?query#fragment", "C:\\path"],
+			["C:\\path\\\0#\\file.js", "C:\\path\\#"],
 		];
 		TESTS.forEach(function(testCase) {
 			it("should get the context of '" + testCase[0] + "'", function() {
