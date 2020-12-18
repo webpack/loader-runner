@@ -13,3 +13,8 @@ after_success:
   - cat ./coverage/lcov.info | node_modules/.bin/coveralls --verbose
   - cat ./coverage/coverage.json | node_modules/codecov.io/bin/codecov.io.js
   - rm -rf ./coverage
+
+arch:
+  - amd64
+  - ppc64le
+  
