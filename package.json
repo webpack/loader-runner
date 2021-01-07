@@ -29,20 +29,16 @@
     "node": ">=6.11.5"
   },
   "files": [
-    "lib/",
-    "bin/",
-    "hot/",
-    "web_modules/",
-    "schemas/"
+    "lib"
   ],
   "devDependencies": {
     "codecov.io": "^0.1.6",
-    "coveralls": "^2.11.6",
-    "eslint": "^3.12.2",
-    "eslint-plugin-node": "^3.0.5",
+    "coveralls": "^3.1.0",
+    "eslint": "^7.17.0",
+    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-nodeca": "^1.0.3",
     "istanbul": "^0.4.1",
-    "mocha": "^3.2.0",
-    "should": "^8.0.2"
+    "mocha": "^8.2.1",
+    "should": "^13.2.3"
   }
 }
