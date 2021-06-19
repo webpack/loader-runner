@@ -34,6 +34,7 @@
     "web_modules/",
     "schemas/"
   ],
+  
   "devDependencies": {
     "eslint": "^3.12.2",
     "eslint-plugin-node": "^3.0.5",
