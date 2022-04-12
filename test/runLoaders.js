@@ -1,5 +1,6 @@
 require("should");
 var path = require("path");
+var fs = require("fs");
 var runLoaders = require("../").runLoaders;
 var getContext = require("../").getContext;
 
@@ -707,6 +708,21 @@ describe("runLoaders", function() {
 			it("should get the context of '" + testCase[0] + "'", function() {
 				getContext(testCase[0]).should.be.eql(testCase[1]);
 			});
+		});
+	});
+	it("should pass arguments from processResource", function(done) {
+		runLoaders({
+			resource: path.resolve(fixtures, "resource.bin"),
+			processResource: function(loaderContext, resourcePath, callback) {
+				fs.readFile(resourcePath, function(err, content) {
+					if(err) return callback(err);
+					return callback(null, content, "source-map", "other-arg");
+				});
+			}
+		}, function(err, result) {
+			if(err) return done(err);
+			result.result.should.be.eql([Buffer.from("resource", "utf-8"), "source-map", "other-arg"]);
+			done();
 		});
 	});
 });
