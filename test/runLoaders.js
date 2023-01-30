@@ -725,4 +725,39 @@ describe("runLoaders", function() {
 			done();
 		});
 	});
+	it("should make getOptions available to loaders", function(done) {
+		runLoaders(
+			{
+				resource: path.resolve(fixtures, "resource.bin"),
+				loaders: [
+					{
+						loader: path.resolve(fixtures, "echo-options-loader.js"),
+						options: {
+							foo: "bar",
+						},
+					},
+				],
+			},
+			(err, result) => {
+				if(err) return done(err);
+				result.result.should.be.eql(["{\"foo\":\"bar\"}"]);
+				done();
+			}
+		);
+	});
+	it("should default to empty getOptions if none provided", function(done) {
+		runLoaders(
+			{
+				resource: path.resolve(fixtures, "resource.bin"),
+				loaders: [
+					path.resolve(fixtures, "echo-options-loader.js"),
+				],
+			},
+			(err, result) => {
+				if(err) return done(err);
+				result.result.should.be.eql(["{}"]);
+				done();
+			}
+		);
+	});
 });
