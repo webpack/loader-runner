@@ -29,11 +29,11 @@ runLoaders({
 
 	// result.result: Buffer | String
 	// The result
-	// only available when no error occured
+	// only available when no error occurred
 
 	// result.resourceBuffer: Buffer
 	// The raw resource as Buffer (useful for SourceMaps)
-	// only available when no error occured
+	// only available when no error occurred
 
 	// result.cacheable: Bool
 	// Is the result cacheable or do it require reexecution?
