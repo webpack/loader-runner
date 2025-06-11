@@ -1,3 +1,3 @@
-exports.pitch = function() {
+exports.pitch = function () {
 	return Promise.resolve();
 };
