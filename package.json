@@ -7,9 +7,9 @@
     "lint": "npm run lint:code",
     "lint:code": "eslint --cache .",
     "pretest": "npm run lint",
-    "test": "mocha --reporter spec",
-    "test:baic": "npm run:basic",
-    "test:cover": "nyc --reporter=lcov npm run:basic"
+    "test": "npm run test:basic",
+    "test:basic": "mocha --reporter spec",
+    "test:cover": "nyc --reporter=lcov npm run test:basic"
   },
   "repository": {
     "type": "git",
