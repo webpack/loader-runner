@@ -4,7 +4,8 @@
   "description": "Runs (webpack) loaders",
   "main": "lib/LoaderRunner.js",
   "scripts": {
-    "lint": "eslint lib test",
+    "lint": "npm run lint:code",
+    "lint:code": "eslint --cache .",
     "pretest": "npm run lint",
     "test": "mocha --reporter spec",
     "precover": "npm run lint",
@@ -35,9 +36,20 @@
     "schemas/"
   ],
   "devDependencies": {
-    "eslint": "^3.12.2",
-    "eslint-plugin-node": "^3.0.5",
-    "eslint-plugin-nodeca": "^1.0.3",
+    "@eslint/js": "^9.28.0",
+    "@eslint/markdown": "^6.5.0",
+    "@stylistic/eslint-plugin": "^4.4.1",
+    "globals": "^16.2.0",
+    "eslint": "^9.28.0",
+    "eslint-config-webpack": "^4.0.9",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-jest": "^28.12.0",
+    "eslint-plugin-jsdoc": "^50.7.1",
+    "eslint-plugin-n": "^17.19.0",
+    "eslint-plugin-prettier": "^5.4.1",
+    "eslint-plugin-unicorn": "^59.0.1",
+    "prettier": "^3.5.3",
     "istanbul": "^0.4.1",
     "mocha": "^3.2.0",
     "should": "^8.0.2"
