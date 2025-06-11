@@ -1,3 +1,4 @@
 /node_modules
 /coverage
 .eslintcache
+.nyc_output

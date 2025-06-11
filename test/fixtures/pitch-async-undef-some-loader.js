@@ -1,7 +1,7 @@
-exports.pitch = function() {
+exports.pitch = function () {
 	var done = this.async();
 
-	setTimeout(function() {
+	setTimeout(function () {
 		done(null, undefined, "not undefined");
 	}, 0);
 };

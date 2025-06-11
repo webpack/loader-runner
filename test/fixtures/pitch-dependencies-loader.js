@@ -1,3 +1,3 @@
-exports.pitch = function(remainingRequest) {
+exports.pitch = function (remainingRequest) {
 	this.addDependency("remainingRequest:" + remainingRequest);
 };
