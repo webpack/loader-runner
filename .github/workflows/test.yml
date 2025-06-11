@@ -55,7 +55,7 @@ jobs:
         if: matrix.node-version == '6.x' || matrix.node-version == '8.x' || matrix.node-version == '10.x' || matrix.node-version == '12.x' || matrix.node-version == '14.x' || matrix.node-version == '16.x'
       - run: npm ci
         if: matrix.node-version != '6.x' && matrix.node-version != '8.x' && matrix.node-version != '10.x' && matrix.node-version != '12.x' && matrix.node-version != '14.x' && matrix.node-version != '16.x'
-      - run: npm run test
+      - run: npm run test:cover
       - uses: codecov/codecov-action@v5
         with:
           flags: integration

@@ -8,7 +8,8 @@
     "lint:code": "eslint --cache .",
     "pretest": "npm run lint",
     "test": "mocha --reporter spec",
-    "cover": "istanbul cover node_modules/mocha/bin/_mocha"
+    "test:baic": "npm run:basic",
+    "test:cover": "nyc --reporter=lcov npm run:basic"
   },
   "repository": {
     "type": "git",
@@ -49,7 +50,7 @@
     "eslint-plugin-prettier": "^5.4.1",
     "eslint-plugin-unicorn": "^59.0.1",
     "prettier": "^3.5.3",
-    "istanbul": "^0.4.1",
+    "nyc": "^14.1.1",
     "mocha": "^3.2.0",
     "should": "^8.0.2"
   }
