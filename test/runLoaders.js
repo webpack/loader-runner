@@ -370,6 +370,10 @@ describe("runLoaders", () => {
 				try {
 					JSON.parse(result.result[0]).should.be.eql({
 						context: null,
+						resource: "",
+						resourcePath: "",
+						resourceQuery: "",
+						resourceFragment: "",
 						loaderIndex: 1,
 						query: "",
 						currentRequest: `${path.resolve(fixtures, "keys-loader.js")}!`,
