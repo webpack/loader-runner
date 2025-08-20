@@ -8,7 +8,6 @@ export default defineConfig([
 			"prefer-spread": "off",
 			"unicorn/prefer-spread": "off",
 			"prefer-rest-params": "off",
-			"n/prefer-node-protocol": "off",
 		},
 	},
 ]);

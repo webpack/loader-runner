@@ -55,7 +55,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           architecture: ${{ steps.calculate_architecture.outputs.result }}
-          cache: "npm"
+          cache: ${{ matrix.node-version == '6.x' && '' || 'npm' }}
       - run: |
           sudo npm i npm@6.x
           sudo npm install --ignore-engines
