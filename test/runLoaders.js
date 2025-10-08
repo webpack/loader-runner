@@ -809,6 +809,186 @@ describe("runLoaders", () => {
 		);
 	});
 
+	it("should have to correct keys in context with empty resource", (done) => {
+		runLoaders(
+			{
+				resource: "",
+				loaders: [
+					`${path.resolve(fixtures, "keys-loader.js")}?loader-query`,
+					path.resolve(fixtures, "simple-loader.js"),
+				],
+			},
+			(err, result) => {
+				if (err) return done(err);
+				try {
+					JSON.parse(result.result[0]).should.be.eql({
+						context: null,
+						resource: "",
+						resourcePath: "",
+						resourceQuery: "",
+						resourceFragment: "",
+						loaderIndex: 0,
+						query: "?loader-query",
+						currentRequest: `${path.resolve(
+							fixtures,
+							"keys-loader.js"
+						)}?loader-query!${path.resolve(fixtures, "simple-loader.js")}!`,
+						remainingRequest: `${path.resolve(fixtures, "simple-loader.js")}!`,
+						previousRequest: "",
+						request: `${path.resolve(
+							fixtures,
+							"keys-loader.js"
+						)}?loader-query!${path.resolve(fixtures, "simple-loader.js")}!`,
+						data: null,
+						loaders: [
+							{
+								request: `${path.resolve(fixtures, "keys-loader.js")}?loader-query`,
+								path: path.resolve(fixtures, "keys-loader.js"),
+								query: "?loader-query",
+								fragment: "",
+								data: null,
+								pitchExecuted: true,
+								normalExecuted: true,
+							},
+							{
+								request: path.resolve(fixtures, "simple-loader.js"),
+								path: path.resolve(fixtures, "simple-loader.js"),
+								query: "",
+								fragment: "",
+								data: null,
+								pitchExecuted: true,
+								normalExecuted: true,
+							},
+						],
+					});
+				} catch (err_) {
+					return done(err_);
+				}
+				done();
+			}
+		);
+	});
+
+	it("should have to correct keys in context with empty resource and set a new resource", (done) => {
+		runLoaders(
+			{
+				resource: "",
+				loaders: [
+					`${path.resolve(fixtures, "keys-loader.js")}?loader-query`,
+					path.resolve(fixtures, "set-resource-loader.js"),
+				],
+			},
+			(err, result) => {
+				if (err) return done(err);
+				try {
+					JSON.parse(result.result[0]).should.be.eql({
+						context: null,
+						resource: `${path.resolve(fixtures, "resource.bin")}?foo=bar#hash`,
+						resourcePath: path.resolve(fixtures, "resource.bin"),
+						resourceQuery: "?foo=bar",
+						resourceFragment: "#hash",
+						loaderIndex: 0,
+						query: "?loader-query",
+						currentRequest: `${path.resolve(
+							fixtures,
+							"keys-loader.js"
+						)}?loader-query!${path.resolve(fixtures, "set-resource-loader.js")}!${path.resolve(fixtures, "resource.bin")}?foo=bar#hash`,
+						remainingRequest: `${path.resolve(fixtures, "set-resource-loader.js")}!${path.resolve(fixtures, "resource.bin")}?foo=bar#hash`,
+						previousRequest: "",
+						request: `${path.resolve(
+							fixtures,
+							"keys-loader.js"
+						)}?loader-query!${path.resolve(fixtures, "set-resource-loader.js")}!${path.resolve(fixtures, "resource.bin")}?foo=bar#hash`,
+						data: null,
+						loaders: [
+							{
+								request: `${path.resolve(fixtures, "keys-loader.js")}?loader-query`,
+								path: path.resolve(fixtures, "keys-loader.js"),
+								query: "?loader-query",
+								fragment: "",
+								data: null,
+								pitchExecuted: true,
+								normalExecuted: true,
+							},
+							{
+								request: path.resolve(fixtures, "set-resource-loader.js"),
+								path: path.resolve(fixtures, "set-resource-loader.js"),
+								query: "",
+								fragment: "",
+								data: null,
+								pitchExecuted: true,
+								normalExecuted: true,
+							},
+						],
+					});
+				} catch (err_) {
+					return done(err_);
+				}
+				done();
+			}
+		);
+	});
+
+	it("should have to correct keys in context with resource and set a new resource", (done) => {
+		runLoaders(
+			{
+				resource: path.resolve(fixtures, "resource.bin"),
+				loaders: [
+					`${path.resolve(fixtures, "keys-loader.js")}?loader-query`,
+					path.resolve(fixtures, "set-empty-resource-loader.js"),
+				],
+			},
+			(err, result) => {
+				if (err) return done(err);
+				try {
+					JSON.parse(result.result[0]).should.be.eql({
+						context: fixtures,
+						resource: "",
+						resourcePath: "",
+						resourceQuery: "",
+						resourceFragment: "",
+						loaderIndex: 0,
+						query: "?loader-query",
+						currentRequest: `${path.resolve(
+							fixtures,
+							"keys-loader.js"
+						)}?loader-query!${path.resolve(fixtures, "set-empty-resource-loader.js")}!`,
+						remainingRequest: `${path.resolve(fixtures, "set-empty-resource-loader.js")}!`,
+						previousRequest: "",
+						request: `${path.resolve(
+							fixtures,
+							"keys-loader.js"
+						)}?loader-query!${path.resolve(fixtures, "set-empty-resource-loader.js")}!`,
+						data: null,
+						loaders: [
+							{
+								request: `${path.resolve(fixtures, "keys-loader.js")}?loader-query`,
+								path: path.resolve(fixtures, "keys-loader.js"),
+								query: "?loader-query",
+								fragment: "",
+								data: null,
+								pitchExecuted: true,
+								normalExecuted: true,
+							},
+							{
+								request: path.resolve(fixtures, "set-empty-resource-loader.js"),
+								path: path.resolve(fixtures, "set-empty-resource-loader.js"),
+								query: "",
+								fragment: "",
+								data: null,
+								pitchExecuted: true,
+								normalExecuted: true,
+							},
+						],
+					});
+				} catch (err_) {
+					return done(err_);
+				}
+				done();
+			}
+		);
+	});
+
 	describe("getContext", () => {
 		const TESTS = [
 			["/", "/"],
