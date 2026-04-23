@@ -30,8 +30,9 @@ runLoaders(
 	},
 	(err, result) => {
 		// err: Error?
-		// result.result: Buffer | String
-		// The result
+		// result.result: [Buffer | String, SourceMap?, Meta?]
+		// The result as an array matching the arguments passed by the final normal loader
+		// (typically [content, sourceMap, meta])
 		// only available when no error occurred
 		// result.resourceBuffer: Buffer
 		// The raw resource as Buffer (useful for SourceMaps)
