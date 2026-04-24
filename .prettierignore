@@ -1,0 +1,7 @@
+package-lock.json
+
+# Ignore some folders
+benchmark/
+coverage/
+
+.vscode/**/*.*
