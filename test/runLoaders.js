@@ -761,6 +761,32 @@ describe("runLoaders", () => {
 			);
 		});
 	}
+
+	if (Number(process.versions.modules) >= 83) {
+		it("should load a commonjs loader using import()", (done) => {
+			runLoaders(
+				{
+					resource: path.resolve(fixtures, "resource.bin"),
+					loaders: [
+						{
+							loader: path.resolve(fixtures, "simple-loader.js"),
+							type: "module",
+						},
+					],
+				},
+				(err, result) => {
+					if (err) return done(err);
+					result.result.should.be.eql(["resource-simple"]);
+					result.cacheable.should.be.eql(true);
+					result.fileDependencies.should.be.eql([
+						path.resolve(fixtures, "resource.bin"),
+					]);
+					result.contextDependencies.should.be.eql([]);
+					done();
+				}
+			);
+		});
+	}
 	it("should support escaping in resource", (done) => {
 		runLoaders(
 			{
