@@ -738,6 +738,29 @@ describe("runLoaders", () => {
 			);
 		});
 	}
+
+	const [nodeMajor, nodeMinor] = process.versions.node.split(".").map(Number);
+	// `require(esm)` is enabled by default starting from Node.js 22.12.0
+	if (nodeMajor > 22 || (nodeMajor === 22 && nodeMinor >= 12)) {
+		it("should load an esm loader using require()", (done) => {
+			runLoaders(
+				{
+					resource: path.resolve(fixtures, "resource.bin"),
+					loaders: [path.resolve(fixtures, "esm-loader.mjs")],
+				},
+				(err, result) => {
+					if (err) return done(err);
+					result.result.should.be.eql(["resource-esm"]);
+					result.cacheable.should.be.eql(true);
+					result.fileDependencies.should.be.eql([
+						path.resolve(fixtures, "resource.bin"),
+					]);
+					result.contextDependencies.should.be.eql([]);
+					done();
+				}
+			);
+		});
+	}
 	it("should support escaping in resource", (done) => {
 		runLoaders(
 			{
