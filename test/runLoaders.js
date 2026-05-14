@@ -786,6 +786,105 @@ describe("runLoaders", () => {
 				}
 			);
 		});
+
+		it("should process an esm pitching loader using import()", (done) => {
+			runLoaders(
+				{
+					resource: path.resolve(fixtures, "resource.bin"),
+					loaders: [
+						path.resolve(fixtures, "simple-loader.js"),
+						{
+							loader: path.resolve(fixtures, "esm-pitching-loader.mjs"),
+							type: "module",
+						},
+						path.resolve(fixtures, "simple-async-loader.js"),
+					],
+				},
+				(err, result) => {
+					if (err) return done(err);
+					result.result.should.be.eql([
+						`${path.resolve(fixtures, "simple-async-loader.js")}!${path.resolve(
+							fixtures,
+							"resource.bin"
+						)}:${path.resolve(fixtures, "simple-loader.js")}-simple`,
+					]);
+					result.cacheable.should.be.eql(true);
+					result.fileDependencies.should.be.eql([]);
+					result.contextDependencies.should.be.eql([]);
+					done();
+				}
+			);
+		});
+
+		it("should process an esm raw loader using import()", (done) => {
+			runLoaders(
+				{
+					resource: path.resolve(fixtures, "bom.bin"),
+					loaders: [
+						{
+							loader: path.resolve(fixtures, "esm-raw-loader.mjs"),
+							type: "module",
+						},
+					],
+				},
+				(err, result) => {
+					if (err) return done(err);
+					result.result[0].toString("utf8").should.be.eql("efbbbf62c3b66d﻿böm");
+					done();
+				}
+			);
+		});
+
+		it("should not return dependencies when an esm loader is not found", (done) => {
+			runLoaders(
+				{
+					resource: path.resolve(fixtures, "resource.bin"),
+					loaders: [
+						{
+							loader: path.resolve(fixtures, "does-not-exist-loader.mjs"),
+							type: "module",
+						},
+					],
+				},
+				(err, result) => {
+					err.should.be.instanceOf(Error);
+					result.should.be.eql({
+						cacheable: false,
+						fileDependencies: [],
+						contextDependencies: [],
+						missingDependencies: [],
+					});
+					done();
+				}
+			);
+		});
+
+		it("should not return dependencies when an esm loader has an invalid default export", (done) => {
+			runLoaders(
+				{
+					resource: path.resolve(fixtures, "resource.bin"),
+					loaders: [
+						{
+							loader: path.resolve(fixtures, "esm-invalid-loader.mjs"),
+							type: "module",
+						},
+					],
+				},
+				(err, result) => {
+					err.should.be.instanceOf(Error);
+					err.message.should.match(
+						/esm-invalid-loader\.mjs' is not a loader \(must have normal or pitch function\)$/
+					);
+					result.should.be.eql({
+						cacheable: false,
+						fileDependencies: [],
+						contextDependencies: [],
+						missingDependencies: [],
+					});
+					done();
+				}
+			);
+		});
 	}
 	it("should support escaping in resource", (done) => {
 		runLoaders(
